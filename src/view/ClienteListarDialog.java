@@ -324,22 +324,33 @@ public class ClienteListarDialog extends javax.swing.JFrame {
     }//GEN-LAST:event_txtSearchCodigoKeyReleased
 
     private void btnAbrirSocketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirSocketActionPerformed
-        try {
-            this.servidor = new Servidor((Integer) 12345, "./src/resource/texto.txt");
-        } catch (IOException ex) {
-            Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        // thread para aguardar as conexões dos clientes
-        threadServer = new Thread(() -> {
+        if (btnAbrirSocket.isSelected() == true) {
             try {
-                this.servidor.executa();
+                this.servidor = new Servidor((Integer) 12345, "./src/resource/texto.txt");
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage(),
-                        "Erro de IO",
-                        JOptionPane.ERROR_MESSAGE);
+                Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
-        this.threadServer.start();
+            // thread para aguardar as conexões dos clientes
+            threadServer = new Thread(() -> {
+                try {
+                    this.servidor.executa();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(),
+                            "Erro de IO",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            this.threadServer.start();
+            btnAbrirSocket.setText("Ouvindo...");
+        } else {
+            try {
+                this.servidor.fechar();
+                btnAbrirSocket.setText("Ouvir");
+            } catch (IOException ex) {
+                Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }//GEN-LAST:event_btnAbrirSocketActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
