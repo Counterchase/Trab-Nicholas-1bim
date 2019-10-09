@@ -27,6 +27,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
 
     private Servidor servidor;
     private Thread threadServer;
+    private Thread threadRefresh;
 
     /**
      * Creates new form ClienteListarDialog
@@ -35,6 +36,19 @@ public class ClienteListarDialog extends javax.swing.JFrame {
         super("Lista de Clientes");
         controller = new ClienteController();
         lista = (List<Cliente>) controller.listar();
+        
+        threadRefresh = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                refreshTable();
+            }
+        });
+        threadRefresh.start();
+
         initComponents();
     }
 
@@ -334,6 +348,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
             threadServer = new Thread(() -> {
                 try {
                     this.servidor.executa();
+
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage(),
                             "Erro de IO",
