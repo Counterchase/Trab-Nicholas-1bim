@@ -34,11 +34,11 @@ public class TrataCliente implements Runnable {
              * subentente-se que o cliente finalizou a conexão.
              * Logo, ele deve ser removido da lista.
              */
-            servidor.removeCliente(cliente);
+//            servidor.removeCliente(cliente);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(servidor.getGUI(), 
-                    ex.getMessage() + " / " + ex.getCause().getMessage(), 
-                    "Erro de I/O Server", JOptionPane.ERROR_MESSAGE);
+//            JOptionPane.showMessageDialog(servidor.getGUI(), 
+//                    ex.getMessage() + " / " + ex.getCause().getMessage(), 
+//                    "Erro de I/O Server", JOptionPane.ERROR_MESSAGE);
         }
     }
 

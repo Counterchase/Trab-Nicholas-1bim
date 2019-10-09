@@ -227,9 +227,9 @@ public class ServerGUI extends JFrame {
                 if (source == btAbrir) {
                     enableComponents(false);
                     clearFields();
-                    servidor = new Servidor(serverGUI,
+                    servidor = new Servidor(
                             (Integer) spinPorta.getValue(),
-                            "./resource/texto.txt");
+                            "./src/resource/texto.txt");
 
                     // thread para aguardar as conexões dos clientes
                     threadServer = new Thread(() -> {

@@ -5,7 +5,9 @@
  */
 package concorrencia;
 
-import concorrencia.Cliente;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import controller.ClienteController;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,17 +16,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import view.ClienteAtualizarDialog;
 
 /**
  *
@@ -35,14 +43,18 @@ public class Servidor {
     private List<Cliente> listaIpClientes;
     private ServerSocket serverSocket;
     private File textFile;
-    private ServerGUI serverGUI;
 
-    public Servidor(ServerGUI form, Integer porta, String pathFile) throws IOException {
-        this.serverGUI = form;
+    Gson gson = new Gson();
+    Type clienteType = new TypeToken<model.Cliente>() {
+    }.getType();
+    Type clienteTypeLista = new TypeToken<List<model.Cliente>>() {
+    }.getType();
+
+    public Servidor(Integer porta, String pathFile) throws IOException {
         serverSocket = new ServerSocket(porta);
         this.textFile = new File(pathFile);
         this.listaIpClientes = new ArrayList<>();
-        initServerMonitor();
+//        initServerMonitor();
     }
 
     private void initServerMonitor() throws UnknownHostException, IOException {
@@ -52,19 +64,13 @@ public class Servidor {
                 + "IP do Servidor: %s\n",
                 sdf.format(cal.getTime()),
                 InetAddress.getLocalHost().getHostAddress());
-        serverGUI.registerToMonitor(msg);
-        serverGUI.updateAreaTexto(lerArquivo());
-    }
-
-    public ServerGUI getGUI() {
-        return this.serverGUI;
     }
 
     public void fechar() throws IOException {
         if (listaIpClientes.size() > 0) {
             /**
-             * Primeiro encaminha a solicitação de encerramento de
-             * conexão aos clientes
+             * Primeiro encaminha a solicitação de encerramento de conexão aos
+             * clientes
              */
             Iterator<Cliente> it = listaIpClientes.iterator();
             while (it.hasNext()) {
@@ -83,20 +89,6 @@ public class Servidor {
 
     public void removeCliente(Cliente cliente) {
         listaIpClientes.remove(cliente);
-        serverGUI.removeClienteIp(cliente);
-        // Atualiza o monitor de informações
-        serverGUI.registerToMonitor(
-                String.format("[Cliente %s encerrou a conexão]\n",
-                        cliente.getHost()));
-    }
-
-    private void registerClient(Cliente cliente) {
-        serverGUI.registerToMonitor(
-                String.format("[Conexão estabelecida com]: %s\n",
-                        cliente.getHost()));
-        serverGUI.addClienteIp(cliente);
-        // adiciona saida do cliente à lista
-        listaIpClientes.add(cliente);
     }
 
     public String lerArquivo() throws FileNotFoundException, IOException {
@@ -141,7 +133,6 @@ public class Servidor {
             Socket clientSocket = serverSocket.accept();
             Cliente cliente = new Cliente(clientSocket);
             // Registra o cliente no servidor
-            registerClient(cliente);
 
             // cria o tratador de cliente em uma nova thread
             TrataCliente tc = new TrataCliente(cliente, this);
@@ -161,8 +152,10 @@ public class Servidor {
         while (s.hasNextLine()) {
             comando = s.nextLine().trim();
             switch (comando) {
+                //esse metodo envia pro cliente as coisas
                 case "lerArquivo":
                     // Lê os dados do arquivo de texto
+                    // E envia para o cliente os dados pelo fluxo de comunicação
                     String conteudo = lerArquivo();
                     // Captura o fluxo de saída para envio de dados
                     PrintStream ps = new PrintStream(cliente.getOutputStream());
@@ -177,25 +170,31 @@ public class Servidor {
                      * Envia mensagem informando os dados já foram enviados
                      */
                     ps.println("---ENDDATA---");
-                    serverGUI.registerToMonitor(
-                            String.format("[Arquivo lido por: %s as %s]\n",
-                                    cliente.getHost(),
-                                    sdf.format(cal.getTime())));
                     break;
+                //esse metodo habilita a gravação do que foi recebido pelo servidor
                 case "gravarArquivo":
                     isToWriteFile = true;
                     break;
+
+                /**
+                 * Indica que a transmissão dos dados do arquivo já finalizaram.
+                 */
                 case "---ENDWRITE---":
-                    /**
-                     * Indica que a transmissão dos dados do arquivo já
-                     * finalizaram.
-                     */
                     escreverArquivo(sb.toString());
+                    
+                    //método que grava o cliente recebido no banco
+                    System.out.println(sb.toString());
+                    model.Cliente c = gson.fromJson(sb.toString(), clienteType);
+                    try {
+                        ClienteController col = new ClienteController();
+                        col.salvar(c);
+                    } catch (SQLException | NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, ex.getMessage());
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(ClienteAtualizarDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
                     // adicoina o conteúdo do arquivo na área de texto
-                    serverGUI.updateAreaTexto(lerArquivo());
-                    serverGUI.registerToMonitor(
-                            String.format("[Arquivo alterado por: %s as %s]\n",
-                                    cliente.getHost(), sdf.format(cal.getTime())));
                     isToWriteFile = false;
                     /**
                      * cria a classe StringBuilder para recomeçar a escrita do
