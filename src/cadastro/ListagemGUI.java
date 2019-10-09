@@ -15,9 +15,10 @@ import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import cadastro.Cliente;
+import java.util.ArrayList;
+import javax.swing.SwingConstants;
 import view.ClienteListarDialog;
 import view.ClienteTableModel;
-import cadastro.TableModelPadraoCadastro;
 
 /**
  *
@@ -28,9 +29,10 @@ public class ListagemGUI extends javax.swing.JFrame {
     /**
      * Creates new form ListagemGUI
      */
+    private List<Cliente> clientes;
+
 
    
-    private TableModelCadastroCliente tmcc;
     
     public ListagemGUI() {
         initComponents();
@@ -39,19 +41,40 @@ public class ListagemGUI extends javax.swing.JFrame {
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.setLocationRelativeTo(this);
         centralizarComponente();
-        construirTabela(tmcc);
+        
+        CadastroTableModel modeloCliente = new CadastroTableModel();
+        modeloCliente.setListaClientes(clientes);
+        tbListagem.setModel(modeloCliente);
+        try {
+            listarTbCliente();
+        } catch (SQLException ex) {
+            Logger.getLogger(ListagemGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
+    
+     
     public void centralizarComponente() {
         Dimension ds = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension dw = getSize();
         setLocation((ds.width - dw.width) - 200, (ds.height - dw.height) / 2);
     }
+     public List<Cliente> listarTbCliente() throws SQLException {
+        clientes = new ArrayList<>();
+        
+            Cliente a = new Cliente();
+            a.setId(0);
+            a.setNome("joao");
+            a.setEmail("joao@email.com");
+            a.setCelular("+5567996902277");
 
-    private void construirTabela(TableModelCadastroCliente tmcc) {
-        tbListagem = new JTable(tmcc);
-        tbListagem.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            clientes.add(a);
+
+        return clientes;
+
     }
+
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
