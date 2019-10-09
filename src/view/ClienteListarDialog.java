@@ -6,8 +6,12 @@
 package view;
 
 import controller.ClienteController;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import model.Cliente;
@@ -20,6 +24,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
 
     private final ClienteController controller;
     private List<Cliente> lista;
+    private ServerSocket server; // joao
 
     /**
      * Creates new form ClienteListarDialog
@@ -66,6 +71,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
         lblCelular = new javax.swing.JLabel();
         txtSearchEmail = new javax.swing.JTextField();
         txtSearchCelular = new javax.swing.JTextField();
+        btnOuvir = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         btFechar = new javax.swing.JButton();
@@ -104,6 +110,13 @@ public class ClienteListarDialog extends javax.swing.JFrame {
 
         lblCelular.setText("Celular:");
 
+        btnOuvir.setText("Ouvir");
+        btnOuvir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOuvirActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -131,11 +144,17 @@ public class ClienteListarDialog extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSearchCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnOuvir)
+                .addGap(18, 18, 18))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(btnOuvir)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblSearchCodigo)
@@ -302,12 +321,43 @@ public class ClienteListarDialog extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtSearchCodigoKeyReleased
 
+    private void btnOuvirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOuvirActionPerformed
+    if( btnOuvir.isSelected() == true){//joao
+        btnOuvir.setText("Ouvindo...");
+        try {
+            server = new ServerSocket(12345);
+            JOptionPane.showMessageDialog(null, "porta 12345 aberta");
+        } catch (IOException ex) {
+            Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }else{
+        btnOuvir.setText("Ouvir");
+        try {
+            server.close();
+            JOptionPane.showMessageDialog(null, "porta 12345 fechada");
+        } catch (IOException ex) {
+            Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+;
+    
+        
+    
+    
+        
+        
+    
+    
+    
+    }//GEN-LAST:event_btnOuvirActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAlterar;
     private javax.swing.JButton btCriar;
     private javax.swing.JButton btExcluir;
     private javax.swing.JButton btFechar;
     private javax.swing.JButton btPesquisar;
+    private javax.swing.JToggleButton btnOuvir;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCelular;
     private javax.swing.JLabel lblEmail;

@@ -56,6 +56,10 @@ public class Cliente {
         mostrarMensagem("Conexão realizada com sucesso!");
     }
 
+    public Cliente() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public void mostrarMensagem(String msg) {
         JOptionPane.showMessageDialog(clienteGUI,
                 msg, "Aviso", JOptionPane.WARNING_MESSAGE);
