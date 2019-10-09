@@ -17,7 +17,7 @@ public class Conexao {
 
     private static Conexao instancia;
     private Connection conexao = null;
-    private String url = "jdbc:postgresql://192.168.0.114:5432/sd";
+    private String url = "jdbc:postgresql://10.10.35.60:5432/sd";
     private String user = "postgres";
     private String password = "root";
 

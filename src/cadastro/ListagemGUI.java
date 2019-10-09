@@ -31,9 +31,6 @@ public class ListagemGUI extends javax.swing.JFrame {
      */
     private List<Cliente> clientes;
 
-
-   
-    
     public ListagemGUI() {
         initComponents();
         this.setVisible(false);
@@ -41,40 +38,36 @@ public class ListagemGUI extends javax.swing.JFrame {
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.setLocationRelativeTo(this);
         centralizarComponente();
-        
-        CadastroTableModel modeloCliente = new CadastroTableModel();
-        modeloCliente.setListaClientes(clientes);
-        tbListagem.setModel(modeloCliente);
+
         try {
-            listarTbCliente();
+            clientes = listarTbCliente();
+            CadastroTableModel modeloCliente = new CadastroTableModel();
+            modeloCliente.setListaClientes(clientes);
+            tbListagem.setModel(modeloCliente);
         } catch (SQLException ex) {
             Logger.getLogger(ListagemGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-     
+
     public void centralizarComponente() {
         Dimension ds = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension dw = getSize();
         setLocation((ds.width - dw.width) - 200, (ds.height - dw.height) / 2);
     }
-     public List<Cliente> listarTbCliente() throws SQLException {
-        clientes = new ArrayList<>();
-        
-            Cliente a = new Cliente();
-            a.setId(0);
-            a.setNome("joao");
-            a.setEmail("joao@email.com");
-            a.setCelular("+5567996902277");
 
-            clientes.add(a);
+    public List<Cliente> listarTbCliente() throws SQLException {
+        this.clientes = new ArrayList<>();
+        Cliente a = new Cliente();
+        a.setId(0);
+        a.setNome("joao");
+        a.setEmail("joao@email.com");
+        a.setCelular("+5567996902277");
 
-        return clientes;
+        this.clientes.add(a);
+
+        return this.clientes;
 
     }
-
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.

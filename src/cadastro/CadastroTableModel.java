@@ -48,7 +48,12 @@ public class CadastroTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return listaClientes.size();
+        if(listaClientes.isEmpty()){
+            return 1;
+        }else{
+            return listaClientes.size();
+        }
+        
     }
 
     @Override
