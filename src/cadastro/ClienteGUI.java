@@ -14,6 +14,8 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  *
@@ -28,11 +30,22 @@ public class ClienteGUI extends javax.swing.JFrame {
     public Socket soquete;
     public String json;
     public OutputStream outputStream;
+   public ListagemGUI listagemGUI = new ListagemGUI();
+    
+
 
     public ClienteGUI() throws IOException {
         initComponents();
+        this.setResizable(false);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(this);
+       
+
         this.soquete = new Socket("localhost", 12345);
         this.outputStream = soquete.getOutputStream();
+        
+        
+        
 
     }
 
@@ -52,6 +65,8 @@ public class ClienteGUI extends javax.swing.JFrame {
         txtEmail = new javax.swing.JTextField();
         txtCelular = new javax.swing.JTextField();
         btnEnviar = new javax.swing.JButton();
+        btnListagem = new javax.swing.JToggleButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,14 +83,23 @@ public class ClienteGUI extends javax.swing.JFrame {
             }
         });
 
+        btnListagem.setText("Listar");
+        btnListagem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListagemActionPerformed(evt);
+            }
+        });
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnListagem)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel2)
@@ -84,16 +108,16 @@ public class ClienteGUI extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtNome, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
                             .addComponent(txtEmail)
-                            .addComponent(txtCelular)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(129, 129, 129)
-                        .addComponent(btnEnviar)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtCelular)
+                            .addComponent(btnEnviar))))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(32, 32, 32)
+                .addContainerGap()
+                .addComponent(btnListagem)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -105,9 +129,9 @@ public class ClienteGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtCelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEnviar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         pack();
@@ -117,10 +141,22 @@ public class ClienteGUI extends javax.swing.JFrame {
         enviar();
         try {
             gravarArquivo();
+            limpaCampos();
         } catch (IOException ex) {
             Logger.getLogger(ClienteGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnEnviarActionPerformed
+
+    private void btnListagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListagemActionPerformed
+        if (btnListagem.isSelected() == true) {
+            listagemGUI.setVisible(true);
+            
+           btnListagem.setText("Fechar Listagem");
+        }else{
+             listagemGUI.setVisible(false);
+             btnListagem.setText("Abrir Listagem");
+        }
+    }//GEN-LAST:event_btnListagemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -154,8 +190,10 @@ public class ClienteGUI extends javax.swing.JFrame {
             public void run() {
                 try {
                     new ClienteGUI().setVisible(true);
+                  
+          
                 } catch (IOException ex) {
-                    Logger.getLogger(ClienteGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(null, "Conexão Nao Permitida, Confira se o Host Permitiu sua Conexão.");
                 }
             }
         });
@@ -163,9 +201,11 @@ public class ClienteGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEnviar;
+    private javax.swing.JToggleButton btnListagem;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JTextField txtCelular;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtNome;
@@ -177,7 +217,7 @@ public class ClienteGUI extends javax.swing.JFrame {
         cl.setNome(txtNome.getText());
         cl.setEmail(txtEmail.getText());
         cl.setCelular(txtCelular.getText());
-        JOptionPane.showMessageDialog(null, "Cliente "+cl.getNome()+" enviado");
+        JOptionPane.showMessageDialog(null, "Cliente " + cl.getNome() + " enviado");
         this.json = gson.toJson(cl, clienteType);
         System.out.println(this.json);
     }
@@ -192,4 +232,11 @@ public class ClienteGUI extends javax.swing.JFrame {
          */
         ps.println("---ENDWRITE---");
     }
+
+    private void limpaCampos() {
+        txtNome.setText("");
+        txtEmail.setText("");
+        txtCelular.setText("");
+    }
+
 }
