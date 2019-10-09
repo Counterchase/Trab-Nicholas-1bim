@@ -20,19 +20,20 @@ import java.util.logging.Logger;
  * @author Estudante
  */
 public class ClienteGUI extends javax.swing.JFrame {
-    
-    private Gson gson;
-     java.lang.reflect.Type clienteType = new TypeToken<model.Cliente>() {
+
+    private Gson gson = new Gson();
+    java.lang.reflect.Type clienteType = new TypeToken<Cliente>() {
     }.getType();
-     
-     private Socket soquete;
-     private String json;
-     private OutputStream outputStream;
-    
+
+    public Socket soquete;
+    public String json;
+    public OutputStream outputStream;
+
     public ClienteGUI() throws IOException {
         initComponents();
-        soquete = new Socket("localhost", 12345);
-      
+        this.soquete = new Socket("localhost", 12345);
+        this.outputStream = soquete.getOutputStream();
+
     }
 
     /**
@@ -172,15 +173,15 @@ public class ClienteGUI extends javax.swing.JFrame {
 
     private void enviar() {
         Cliente cl = new Cliente();
-       cl.setNome(txtNome.getText());
-       cl.setEmail(txtEmail.getText());
-       cl.setCelular(txtCelular.getText());
-        JOptionPane.showMessageDialog(null, "Dados Enviados!..");
-         this.json = gson.toJson(cl, clienteType);
-         System.out.println(this.json);
-        
-        
+        cl.setId(0);
+        cl.setNome(txtNome.getText());
+        cl.setEmail(txtEmail.getText());
+        cl.setCelular(txtCelular.getText());
+        JOptionPane.showMessageDialog(null, "Cliente "+cl.getNome()+" enviado");
+        this.json = gson.toJson(cl, clienteType);
+        System.out.println(this.json);
     }
+
     public void gravarArquivo() throws IOException {
         PrintStream ps = new PrintStream(this.outputStream);
         ps.println("gravarArquivo");
