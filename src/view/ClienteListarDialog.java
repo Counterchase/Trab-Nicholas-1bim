@@ -36,19 +36,6 @@ public class ClienteListarDialog extends javax.swing.JFrame {
         super("Lista de Clientes");
         controller = new ClienteController();
         lista = (List<Cliente>) controller.listar();
-        
-        threadRefresh = new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ClienteListarDialog.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                refreshTable();
-            }
-        });
-        threadRefresh.start();
-
         initComponents();
     }
 
@@ -88,6 +75,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
         txtSearchEmail = new javax.swing.JTextField();
         txtSearchCelular = new javax.swing.JTextField();
         btnAbrirSocket = new javax.swing.JToggleButton();
+        btnRefreshTable = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         btFechar = new javax.swing.JButton();
@@ -133,6 +121,13 @@ public class ClienteListarDialog extends javax.swing.JFrame {
             }
         });
 
+        btnRefreshTable.setText("Atualiza Listagem");
+        btnRefreshTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshTableActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -155,29 +150,31 @@ public class ClienteListarDialog extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(mainPanelLayout.createSequentialGroup()
                         .addComponent(txtSearchCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblCelular)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSearchCelular, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnRefreshTable)
                         .addContainerGap())))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnAbrirSocket)
-                .addGap(18, 18, 18))
+                .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(btnAbrirSocket)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(22, 22, 22)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblSearchCodigo)
-                        .addComponent(txtSearchCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtSearchCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblCelular))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtSearchCelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblCelular)))
+                        .addComponent(btnRefreshTable)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtSearchNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -294,6 +291,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
         int iRow = tabela.getSelectedRow();
         if (iRow >= 0) {
             Cliente objeto = lista.get(iRow);
+            System.out.println(objeto.getId());
 
             int resposta = JOptionPane.showConfirmDialog(this,
                     "Deseja excluir o item selecionado?",
@@ -302,8 +300,9 @@ public class ClienteListarDialog extends javax.swing.JFrame {
                 try {
                     controller.delete(objeto.getId());
                 } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
                     JOptionPane.showMessageDialog(this,
-                            String.format("Erro ao excluir.\nMensagem: %s",
+                            String.format("Erro ao excluir isto.\nMensagem: %s",
                                     ex.getMessage()),
                             "Erro ao excluir item",
                             JOptionPane.ERROR_MESSAGE);
@@ -368,6 +367,10 @@ public class ClienteListarDialog extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnAbrirSocketActionPerformed
 
+    private void btnRefreshTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshTableActionPerformed
+        refreshTable();
+    }//GEN-LAST:event_btnRefreshTableActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAlterar;
     private javax.swing.JButton btCriar;
@@ -375,6 +378,7 @@ public class ClienteListarDialog extends javax.swing.JFrame {
     private javax.swing.JButton btFechar;
     private javax.swing.JButton btPesquisar;
     private javax.swing.JToggleButton btnAbrirSocket;
+    private javax.swing.JButton btnRefreshTable;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCelular;
     private javax.swing.JLabel lblEmail;

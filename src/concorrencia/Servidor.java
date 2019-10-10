@@ -141,9 +141,12 @@ public class Servidor {
         }
     }
 
-    public void executarComando(Cliente cliente) throws IOException {
+    public void executarComando(Cliente cliente) throws IOException, SQLException, ClassNotFoundException {
         // Identifica o comando a ser executado
         Scanner s = new Scanner(cliente.getInputStream());
+        ClienteController cc = new ClienteController();
+        PrintStream ps;
+        String conteudo;
         boolean isToWriteFile = false;
         StringBuilder sb = new StringBuilder();
         Calendar cal = Calendar.getInstance();
@@ -156,9 +159,9 @@ public class Servidor {
                 case "lerArquivo":
                     // Lê os dados do arquivo de texto
                     // E envia para o cliente os dados pelo fluxo de comunicação
-                    String conteudo = lerArquivo();
+                    conteudo = lerArquivo();
                     // Captura o fluxo de saída para envio de dados
-                    PrintStream ps = new PrintStream(cliente.getOutputStream());
+                    ps = new PrintStream(cliente.getOutputStream());
                     /**
                      * Envia mensagem informando que um conjunto de dados será
                      * enviado
@@ -181,19 +184,15 @@ public class Servidor {
                  */
                 case "---ENDWRITE---":
                     escreverArquivo(sb.toString());
-                    
+
                     //método que grava o cliente recebido no banco
                     System.out.println(sb.toString());
                     model.Cliente c = gson.fromJson(sb.toString(), clienteType);
                     try {
-                        ClienteController col = new ClienteController();
-                        col.salvar(c);
+                        cc.salvar(c);
                     } catch (SQLException | NumberFormatException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
-                    } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(ClienteAtualizarDialog.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
                     // adicoina o conteúdo do arquivo na área de texto
                     isToWriteFile = false;
                     /**
@@ -201,6 +200,23 @@ public class Servidor {
                      * texto no arquivo a ser enviado para o cliente
                      */
                     sb = new StringBuilder();
+                    break;
+                case "---SENDLIST---":
+                    //Gera a lista de clientes com base numa consulta no banco
+                    conteudo = gson.toJson(cc.listar(), clienteTypeLista);
+                    // Captura o fluxo de saída para envio de dados
+                    ps = new PrintStream(cliente.getOutputStream());
+                    /**
+                     * Envia mensagem informando que um conjunto de dados será
+                     * enviado
+                     */
+                    ps.println("---NEWDATA---");
+                    // envia o conteúdo do arquivo para o cliente
+                    ps.println(conteudo);
+                    /**
+                     * Envia mensagem informando os dados já foram enviados
+                     */
+                    ps.println("---ENDDATA---");
                     break;
                 default:
                     if (isToWriteFile) {

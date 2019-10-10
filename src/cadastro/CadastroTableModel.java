@@ -12,8 +12,7 @@ public class CadastroTableModel extends AbstractTableModel {
     private List<String> cabecalho;
 
     //item - linhas da tabela
-    private List<Cliente> listaClientes ;
-   
+    private List<Cliente> listaClientes;
 
     public void setListaClientes(List<Cliente> listaClientes) {
         this.listaClientes = listaClientes;
@@ -48,12 +47,7 @@ public class CadastroTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        if(listaClientes.isEmpty()){
-            return 1;
-        }else{
-            return listaClientes.size();
-        }
-        
+        return listaClientes.size();
     }
 
     @Override

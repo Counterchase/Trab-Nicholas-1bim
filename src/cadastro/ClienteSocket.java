@@ -9,9 +9,13 @@ import javax.swing.JOptionPane;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -21,32 +25,32 @@ import javax.swing.JPanel;
  *
  * @author Estudante
  */
-public class ClienteGUI extends javax.swing.JFrame {
+public class ClienteSocket extends javax.swing.JFrame {
 
     private Gson gson = new Gson();
     java.lang.reflect.Type clienteType = new TypeToken<Cliente>() {
+    }.getType();
+    java.lang.reflect.Type clienteTypeLista = new TypeToken<List<Cliente>>() {
     }.getType();
 
     public Socket soquete;
     public String json;
     public OutputStream outputStream;
-   public ListagemGUI listagemGUI = new ListagemGUI();
+    public InputStream inputStream;
+    public ListagemSocket listagemGUI;
+    public List<Cliente> listaDeClientes;
     
-
-
-    public ClienteGUI() throws IOException {
+    public ClienteSocket() throws IOException {
         initComponents();
         this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(this);
-       
 
         this.soquete = new Socket("localhost", 12345);
         this.outputStream = soquete.getOutputStream();
-        
-        
-        
-
+        this.inputStream = soquete.getInputStream();
+        escutador();
+        this.listaDeClientes = getClientes();
     }
 
     /**
@@ -143,18 +147,23 @@ public class ClienteGUI extends javax.swing.JFrame {
             gravarArquivo();
             limpaCampos();
         } catch (IOException ex) {
-            Logger.getLogger(ClienteGUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ClienteSocket.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void btnListagemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListagemActionPerformed
         if (btnListagem.isSelected() == true) {
+            System.out.println("Chamando ListagemSocket");
+            getClientes();
+            listagemGUI = new ListagemSocket(this.listaDeClientes);
+            getClientes();
+            listagemGUI = new ListagemSocket(this.listaDeClientes);
             listagemGUI.setVisible(true);
-            
-           btnListagem.setText("Fechar Listagem");
-        }else{
-             listagemGUI.setVisible(false);
-             btnListagem.setText("Abrir Listagem");
+
+            btnListagem.setText("Fechar Listagem");
+        } else {
+            listagemGUI.setVisible(false);
+            btnListagem.setText("Abrir Listagem");
         }
     }//GEN-LAST:event_btnListagemActionPerformed
 
@@ -175,23 +184,23 @@ public class ClienteGUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ClienteGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClienteSocket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ClienteGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClienteSocket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ClienteGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClienteSocket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ClienteGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClienteSocket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new ClienteGUI().setVisible(true);
-                  
-          
+                    new ClienteSocket().setVisible(true);
+
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, "Conexão Nao Permitida, Confira se o Host Permitiu sua Conexão.");
                 }
@@ -220,6 +229,7 @@ public class ClienteGUI extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Cliente " + cl.getNome() + " enviado");
         this.json = gson.toJson(cl, clienteType);
         System.out.println(this.json);
+        getClientes();
     }
 
     public void gravarArquivo() throws IOException {
@@ -237,6 +247,38 @@ public class ClienteGUI extends javax.swing.JFrame {
         txtNome.setText("");
         txtEmail.setText("");
         txtCelular.setText("");
+    }
+
+    public void escutador() {
+        Thread t = new Thread(() -> {
+            Scanner s = new Scanner(this.inputStream);
+            String sData;
+            boolean newData = false;
+            while (s.hasNextLine()) {
+                sData = s.nextLine();
+                switch (sData) {
+                    case "---NEWDATA---":
+                        newData = true;
+                        break;
+                    case "---ENDDATA---":
+                        newData = false;
+                        break;
+                    default:
+                        if (newData) {
+                            this.listaDeClientes = gson.fromJson(sData, clienteTypeLista);
+                            System.out.println("Recebe json");
+                        }
+                }
+            }
+        });
+        t.start();
+    }
+
+    public List<Cliente> getClientes() {
+        System.out.println("2");
+        PrintStream ps = new PrintStream(this.outputStream);
+        ps.println("---SENDLIST---");
+        return this.listaDeClientes;
     }
 
 }

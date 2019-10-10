@@ -110,6 +110,12 @@ public class Cliente {
         PrintStream ps = new PrintStream(this.outputStream);
         ps.println("lerArquivo");
     }
+    
+//    Solicita a lista de clientes
+    public void listaClientes() throws IOException {
+        PrintStream ps = new PrintStream(this.outputStream);
+        ps.println("---SENDLIST---");
+    }
 
     /**
      * Solicita que os dados digitados no cliente sejam gravados no arquivo de

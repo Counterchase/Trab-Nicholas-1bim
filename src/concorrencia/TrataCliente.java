@@ -7,6 +7,9 @@ package concorrencia;
 
 import concorrencia.Cliente;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -39,6 +42,10 @@ public class TrataCliente implements Runnable {
 //            JOptionPane.showMessageDialog(servidor.getGUI(), 
 //                    ex.getMessage() + " / " + ex.getCause().getMessage(), 
 //                    "Erro de I/O Server", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            Logger.getLogger(TrataCliente.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TrataCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
